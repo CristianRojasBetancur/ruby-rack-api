@@ -11,33 +11,37 @@ es:
 
   errors:
     blank:
-      message: 'El campo %{field} no puede estar en blanco'
+      message: '%{field} no puede estar en blanco'
       index: '0'
       code: '0001'
     too_short:
-      message: 'El campo %{field} debe tener al menos %{count} caracteres'
+      message: '%{field} debe tener al menos %{count} caracteres'
       index: '0'
       code: '0002'
     too_long:
-      message: 'El campo %{field} debe tener menos de %{count} caracteres'
+      message: '%{field} debe tener menos de %{count} caracteres'
       index: '0'
       code: '0003'
-    invalid:
-      message: 'El campo %{field} es inválido'
+    unique:
+      message: '%{field} ya está en uso'
       index: '0'
       code: '0004'
+    invalid:
+      message: '%{field} es inválido'
+      index: '0'
+      code: '0005'
     unauthorized:
       message: 'Credenciales inválidas'
       index: '0'
-      code: '0005'
+      code: '0006'
     not_found:
       message: 'El recurso solicitado no existe'
       index: '0'
-      code: '0006'
+      code: '0007'
     bad_request:
       message: 'Solicitud inválida'
       index: '0'
-      code: '0007'
+      code: '0008'
 
   messages:
     enqueued: 'Procesando asincrónicamente'

@@ -46,6 +46,18 @@ class CreateUserServiceTest < Minitest::Test
     assert_nil @repo.find_by_email('bademail.com'), 'User should not be created'
   end
 
+  def test_invalid_create_with_email_in_use
+    Users::Create.new(@repo).call({ 'email' => 'user@email.com', 'password' => 'validPassword123' })
+
+    raised_exception = assert_raises ValidationError do
+      Users::Create.new(@repo).call({ 'email' => 'user@email.com', 'password' => 'validPassword123' })
+    end
+
+    expected_message = translate_expected_message('errors.unique.message', { field: translate_field('user', 'email') })
+
+    assert_equal raised_exception.errors.first[:message], expected_message, 'Should be unique error message'
+  end
+
   def test_invalid_create_without_password
     raised_exception = assert_raises ValidationError do
       Users::Create.new(@repo).call({ 'email' => 'user@email.com', 'password' => '' })
