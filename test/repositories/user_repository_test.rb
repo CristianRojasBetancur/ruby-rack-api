@@ -2,8 +2,9 @@ require_relative '../test_helper'
 
 class UserRepositoryTest < Minitest::Test
   def setup
-    @store = MemoryStore.new
-    @repo = UserRepository.new(@store)
+    USER_STORE.clear!
+
+    @repo = UserRepository.new(USER_STORE)
   end
 
   def test_add_new_user
@@ -14,15 +15,14 @@ class UserRepositoryTest < Minitest::Test
     assert_equal user.id, found_user.id, 'User id must exists'
   end
 
-  def test_get_all_users
-    product_names = %w[Laptop Monitor Keyboard]
+  def test_find_by_email
+    email = 'user@email.com'
+    user = User.new(email, 'validPassword123')
+    @repo.add(user) if user.valid?
 
-    product_names.map do |name|
-      product = Product.new(name)
-      @repo.add(product) if product.valid?
-    end
+    found_user = @repo.find_by_email(email)
 
-    assert_equal 3, @repo.all.size, 'Products count must be same of created products'
-    assert_equal product_names, @repo.all.map(&:name), 'Products names must be same of created products'
+    assert found_user, 'Should find user by email'
+    assert_equal email, found_user.email, 'Should find correct user'
   end
 end

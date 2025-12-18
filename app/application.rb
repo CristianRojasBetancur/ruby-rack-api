@@ -4,7 +4,7 @@ class Application
 
   def call(env)
     response = ROUTES.call(env)
-    return not_found_response if response.first == 404
+    return not_found_response if response.first.eql?(404)
 
     response
   end

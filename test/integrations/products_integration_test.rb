@@ -6,7 +6,13 @@ class ProductsIntegrationTest < Minitest::Test
   include Support::RequestsSupport
   include Support::ResponseSupport
 
-  def test_list_products_flow
+  def setup
+    PRODUCT_STORE.clear!
+    USER_STORE.clear!
+    JOB_STORE.clear!
+  end
+
+  def test_index_products_flow
     email, password = 'user@example.com', 'validPassword123'
 
     post_user({ email: email, password: password })

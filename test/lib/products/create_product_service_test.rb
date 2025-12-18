@@ -5,6 +5,8 @@ class CreateProductServiceTest < Minitest::Test
   include Support::TranslateSupport
 
   def setup
+    PRODUCT_STORE.clear!
+
     @repo = ProductRepository.new(PRODUCT_STORE)
   end
 

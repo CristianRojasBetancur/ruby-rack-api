@@ -1,8 +1,8 @@
-FROM ruby:3.3-slim
+FROM ruby:3.4.7-slim
 
 ENV APP_HOME=/app \
     BUNDLE_PATH=/gems \
-    RACK_ENV=production
+    RACK_ENV=development
 
 WORKDIR $APP_HOME
 
@@ -10,6 +10,7 @@ RUN apt-get update -qq && \
     apt-get install -y --no-install-recommends \
       build-essential \
       libssl-dev \
+      libyaml-dev \
       && rm -rf /var/lib/apt/lists/*
 
 COPY Gemfile Gemfile.lock ./

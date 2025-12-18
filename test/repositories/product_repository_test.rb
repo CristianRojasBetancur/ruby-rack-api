@@ -2,6 +2,8 @@ require_relative '../test_helper'
 
 class ProductRepositoryTest < Minitest::Test
   def setup
+    PRODUCT_STORE.clear!
+
     @repo = ProductRepository.new(PRODUCT_STORE)
   end
 
