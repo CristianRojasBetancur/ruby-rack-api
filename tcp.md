@@ -1,0 +1,3 @@
+### ¿Qué es TCP?
+
+Transfer Control Protocol, es el protocolo que se encarga de que los datos enviados desde un servidor lleguen íntegros al servidor destino, es decir, garantiza que los datos se transfieran tal como se enviaron. Generalmente funciona con IP (Internet protocol) que da la dirección del servidor para que, a través de los enrutadores, no solo se garantice que la información llegue tal cual se envió sino también lo más rápido posible.

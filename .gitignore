@@ -1,0 +1,6 @@
+.budle/
+Gemfile.lock
+*.gem
+gems
+.env.test
+.env.development

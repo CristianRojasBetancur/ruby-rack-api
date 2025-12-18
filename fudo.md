@@ -1,0 +1,3 @@
+### ¿Qué es FUDO?
+
+Son un conjunto de personas con una visión clara y centrada en las necesidades de los usuarios, enfocado en el sector culinario, brindando un producto que permite gestionar todo el ciclo de vida de cualquier negocio, restaurantes, bares, cafés, islas, panaderías, etc. Ofreciendo todos los módulos necesarios para hacer más fácil la vida de los usuarios en términos de gestión y soluciones reales y puntuales.

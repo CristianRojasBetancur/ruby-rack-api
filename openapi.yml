@@ -1,0 +1,75 @@
+openapi: 3.0.0
+info:
+  title: Gestión de productos
+  description: Rack API para gestión de productos
+  version: 1.0.0
+servers:
+  - url: http://localhost:3000
+
+paths:
+  /products:
+    get:
+      summary: Lista todos los productos de un usuario.
+      responses:
+        '200':
+          description: Lista de productos
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: List of products
+    post:
+      summary: Crear un nuevo producto
+      responses:
+        '201':
+          description: Product created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Product created
+
+  /sessions:
+    post:
+      summary: Login
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - email
+                - password
+              properties:
+                email:
+                  type: string
+                password:
+                  type: string
+      responses:
+        '201':
+          description: Login successful
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                  email:
+                    type: string
+                  expires_in:
+                    type: integer
+        '401':
+          description: Invalid credentials
+    delete:
+      summary: Logout
+      responses:
+        '204':
+          description: Logout successful
