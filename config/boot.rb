@@ -9,6 +9,7 @@ ENV['RACK_ENV'] ||= 'development'
 Dotenv.load(".env.#{ENV['RACK_ENV']}", '.env')
 
 require_relative 'initializers/i18n'
+require_relative 'initializers/scalar'
 
 Dir[File.join(__dir__, '../app/models/concerns/**/*.rb')].sort.each { |file| require file }
 Dir[File.join(__dir__, '../app/models/*.rb')].sort.each { |file| require file }

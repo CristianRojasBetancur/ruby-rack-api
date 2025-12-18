@@ -1,6 +1,6 @@
 module ResponseHelper
   def error_response(errors, status = 400)
-    [status, { "Content-Type" => "application/json" }, [{ 'errors' => errors.first }.to_json]]
+    [status, { "Content-Type" => "application/json" }, [{ 'errors' => [errors.first] }.to_json]]
   end
 
   def build_response(body, status = 200)

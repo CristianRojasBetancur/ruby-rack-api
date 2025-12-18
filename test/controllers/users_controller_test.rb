@@ -35,7 +35,7 @@ class UsersControllerTest < Minitest::Test
     translated_field = translate_field('user', 'email')
     expected_message = translate_expected_message('errors.invalid.message', { field: translated_field })
 
-    assert_equal expected_message, error_response['message'], 'Must be invalid message'
+    assert_equal expected_message, response_errors[0]['message'], 'Must be invalid message'
   end
 
   def test_create_with_invalid_password
@@ -48,7 +48,7 @@ class UsersControllerTest < Minitest::Test
     ['some', 'too_long'*100].each_with_index do |invalid_password, index|
       post_user({ email: 'user@example.com', password: invalid_password })
       assert_equal 422, last_response.status, 'Status must be 422'
-      assert_equal expected_messages[index], error_response['message'], 'Must be invalid message'
+      assert_equal expected_messages[index], response_errors[0]['message'], 'Must be invalid message'
     end
   end
 

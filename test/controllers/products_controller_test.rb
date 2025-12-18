@@ -34,7 +34,7 @@ class ProductsControllerTest < Minitest::Test
 
     expected_message = translate_expected_message('errors.unauthorized.message')
 
-    assert_equal expected_message, error_response['message'], 'Must be invalid credentials message'
+    assert_equal expected_message, response_errors[0]['message'], 'Must be invalid credentials message'
   end
 
   def test_invalid_index_without_authentication
@@ -43,7 +43,7 @@ class ProductsControllerTest < Minitest::Test
 
     expected_message = translate_expected_message('errors.unauthorized.message')
 
-    assert_equal expected_message, error_response['message'], 'Must be invalid credentials message'
+    assert_equal expected_message, response_errors[0]['message'], 'Must be invalid credentials message'
   end
 
   def test_invalid_create

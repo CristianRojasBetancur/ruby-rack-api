@@ -40,4 +40,4 @@ es:
       code: '0007'
 
   messages:
-    enqueued: 'Procesando asincronamente'
+    enqueued: 'Procesando asincrónicamente'

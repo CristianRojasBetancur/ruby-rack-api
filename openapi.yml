@@ -1,43 +1,28 @@
 openapi: 3.0.0
 info:
-  title: Gestión de productos
-  description: Rack API para gestión de productos
+  title: Ruby Rack API
+  description: API construida con Rack
   version: 1.0.0
 servers:
   - url: http://localhost:3000
 
-paths:
-  /products:
-    get:
-      summary: Lista todos los productos de un usuario.
-      responses:
-        '200':
-          description: Lista de productos
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  message:
-                    type: string
-                    example: List of products
-    post:
-      summary: Crear un nuevo producto
-      responses:
-        '201':
-          description: Product created
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  message:
-                    type: string
-                    example: Product created
+tags:
+  - name: Usuarios
+    description: Endpoint para registrar usuarios.
+  - name: Sesiones
+    description: Enpoints para gestionar sesiones.
+  - name: Productos
+    description: Endpoints para gestionar productos.
+  - name: Jobs
+    description: Endpoint para obtener el estado de los jobs asíncronos.
 
-  /sessions:
+paths:
+  /users:
     post:
-      summary: Login
+      tags:
+        - Usuarios
+      summary: Crear usuario
+      description: Crear un nuevo usuario
       requestBody:
         required: true
         content:
@@ -50,26 +35,364 @@ paths:
               properties:
                 email:
                   type: string
+                  format: email
                 password:
                   type: string
+                  minLength: 8
+                  maxLength: 100
       responses:
         '201':
-          description: Login successful
+          description: Usuario creado exitosamente
           content:
             application/json:
               schema:
                 type: object
                 properties:
-                  id:
-                    type: integer
-                  email:
-                    type: string
-                  expires_in:
-                    type: integer
+                  data:
+                    type: object
+                    properties:
+                      user:
+                        type: object
+                        properties:
+                          id:
+                            type: string
+                            format: uuid
+                            example: 123e4567-e89b-12d3-a456-426614174000
+                          email:
+                            type: string
+                            format: email
+                            example: user@example.com
+        '422':
+          description: Error de validación
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '400':
+          description: Petición inválida
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InvalidRequest'
+
+  /sessions:
+    post:
+      tags:
+        - Sesiones
+      summary: Crear una sesión
+      description: |
+        Este endpoint permite crear una sesión para un usuario registrado.
+
+        **Nota:** La sesión tiene una duración de 1 hora y se almacena en una cookie firmada llamada `_rack_session`.
+
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - email
+                - password
+              properties:
+                email:
+                  type: string
+                  format: email
+                password:
+                  type: string
+      responses:
+        '201':
+          description: Inicio de sesión exitoso
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      user_id:
+                        type: string
+                        format: uuid
+                        example: 123e4567-e89b-12d3-a456-426614174000
+                      email:
+                        type: string
+                        format: email
+                        example: user@example.com
+                      expires_after:
+                        type: integer
+                        example: '3600'
+        '400':
+          description: Petición inválida
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InvalidRequest'
         '401':
-          description: Invalid credentials
+          description: Credenciales inválidas
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InvalidCredentials'
     delete:
-      summary: Logout
+      tags:
+        - Sesiones
+      summary: Cerrar sesión
       responses:
         '204':
-          description: Logout successful
+          description: Sesión cerrada exitosamente
+        '401':
+          description: No autenticado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InvalidCredentials'
+
+  /products:
+    get:
+      tags:
+        - Productos
+      summary: Listar productos
+      description: |
+        ⚠️ Este endpoint requiere estar autenticado. ⚠️
+
+        Este endpoint permite listar todos los productos disponibles.
+
+        **Nota:** Al crear un nuevo producto, no se reflejará inmediatamente el producto creado en el listado de productos
+        porque el endpoint `/products` es asíncrono.
+      responses:
+        '200':
+          description: Lista de productos
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      products:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            id:
+                              type: string
+                              format: uuid
+                              example: 123e4567-e89b-12d3-a456-426614174000
+                            name:
+                              type: string
+                              example: Some product
+        '401':
+          description: No autenticado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InvalidCredentials'
+    post:
+      tags:
+        - Productos
+      summary: Crear producto (Asíncrono)
+      description: |
+        ⚠️ Este endpoint requiere estar autenticado. ⚠️
+
+        Este endpoint permite crear un nuevo producto.
+
+        **Nota:** Al crear un nuevo producto, este endpoint no retornará inmediatamente el producto. Se retornará un mensaje indicando
+        que la creación del producto se ha encolado junto con el ID del job que procesará la creación del producto en segundo plano.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - name
+              properties:
+                name:
+                  type: string
+                  minLength: 3
+                  maxLength: 100
+      responses:
+        '202':
+          description: Petición aceptada y creación del producto encolada
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      message:
+                        type: string
+                        example: Procesando asincrónicamente
+                      job_id:
+                        type: string
+                        format: uuid
+                        example: 123e4567-e89b-12d3-a456-426614174000
+        '400':
+          description: Petición inválida
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InvalidRequest'
+        '401':
+          description: No autenticado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InvalidCredentials'
+
+  /jobs/{id}:
+    get:
+      tags:
+        - Jobs
+      summary: Consultar estado de un job asíncrono
+      description: |
+        ⚠️ Este endpoint requiere estar autenticado. ⚠️
+
+        Este endpoint permite consultar el estado de un job asíncrono.
+
+        Posibles estados:
+
+        - `pending`: El job está encolado y se está procesando.
+        - `completed`: El job se ha completado exitosamente.
+        - `failed`: El job ha fallado.
+        - `expired`: El job ha expirado.
+
+        En caso de que el estado del job sea `completed`, se retorna el ID del objeto procesado.
+
+        En caso de que el estado del job sea `failed`, se retorna en la llave `error` los errores ocurridos durante el procesamiento del job.
+      parameters:
+        - in: path
+          name: id
+          schema:
+            type: string
+            format: uuid
+          required: true
+          description: ID del job
+      responses:
+        '200':
+          description: Estado del job
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      job:
+                        type: object
+                        properties:
+                          id:
+                            type: string
+                            format: uuid
+                          status:
+                            type: string
+                            enum: [pending, completed, failed, expired]
+                            example: failed
+                          errors:
+                            type: array
+                            items:
+                              type: object
+                              properties:
+                                message:
+                                  type: string
+                                  example: El campo Nombre debe tener al menos 3 caracteres
+                                index:
+                                  type: integer
+                                  example: '0'
+                                code:
+                                  type: string
+                                  example: '0002'
+                          object_id:
+                            type: string
+                            nullable: true
+                          created_at:
+                            type: string
+                            format: date-time
+        '404':
+          description: Recurso no encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFound'
+        '401':
+          description: No autenticado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InvalidCredentials'
+
+components:
+  schemas:
+    ErrorResponse:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            type: object
+            properties:
+              message:
+                type: string
+                example: El campo es inválido
+              index:
+                type: integer
+                example: '0'
+              code:
+                type: string
+                example: '0004'
+    InvalidRequest:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            type: object
+            properties:
+              message:
+                type: string
+                example: Solicitud inválida
+              index:
+                type: integer
+                example: '0'
+              code:
+                type: string
+                example: '0007'
+    InvalidCredentials:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            type: object
+            properties:
+              message:
+                type: string
+                example: Credenciales inválidas
+              index:
+                type: integer
+                example: '0'
+              code:
+                type: string
+                example: '0005'
+    NotFound:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            type: object
+            properties:
+              message:
+                type: string
+                example: El recurso solicitado no existe
+              index:
+                type: integer
+                example: '0'
+              code:
+                type: string
+                example: '0006'

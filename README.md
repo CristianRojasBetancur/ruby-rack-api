@@ -76,3 +76,9 @@ Si quieres ejecutar un solo test, puedes ejecutar el siguiente comando (también
 ```
 docker compose run api bundle exec ruby -Itest <test_directory> -n <test_name>
 ```
+
+## Docs
+
+Además de exponer estáticamente el archivo de documentación, también es posible acceder a la documentación de la API a través de la ruta `/docs`.
+
+Este endpoint utiliza Scalar para generar una interfaz gráfica de la documentación de la API basada en SwaggerUI.

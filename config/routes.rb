@@ -7,6 +7,5 @@ ROUTES = Rack::Router.new do
   delete '/sessions' => SessionsController.new.method(:delete)
   post '/users' => UsersController.new.method(:create)
   get '/jobs/:id' => JobsController.new.method(:show)
-
-  
+  get '/docs' => Scalar::UI
 end

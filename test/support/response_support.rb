@@ -4,7 +4,7 @@ module Support
       JSON.parse(last_response.body)['data']
     end
 
-    def error_response
+    def response_errors
       JSON.parse(last_response.body)['errors']
     end
   end
